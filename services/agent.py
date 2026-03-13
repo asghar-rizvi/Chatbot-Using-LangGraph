@@ -28,7 +28,7 @@ def build_graph():
     global _graph
     
     llm = ChatGoogleGenerativeAI(
-        model="gemini-2.0-flash",
+        model="gemini-2.5-flash",
         google_api_key=os.getenv("GOOGLE_API_KEY"),
         temperature=0,
         streaming=True,
@@ -55,13 +55,11 @@ def build_graph():
     #Graphs Edges
     g.add_edge(START, "chatbot_node")
     g.add_conditional_edges("chatbot_node", tools_condition)
-    g.add_edge("tool", "chatbot_node")
+    g.add_edge("tools", "chatbot_node")
     
     _graph = g.compile()
 
 def get_graph():
-    if _graph is None:
-        build_graph()
     return _graph
 
 async def stream_response(messages: list[BaseMessage]): 
@@ -77,9 +75,23 @@ async def stream_response(messages: list[BaseMessage]):
                 
                 chunk = ev["data"]["chunk"]
 
-                if hasattr(chunk, "content") and isinstance(chunk.content, str) and chunk.content:
-                    full += chunk.content
-                    yield f"data: {json.dumps({"type":"token", "content": chunk.content})}\n\n\n"
+                text = ""
+                if hasattr(chunk, "content"):
+                    c = chunk.content
+
+                    if isinstance(c, str):
+                        text = c
+
+                    elif isinstance(c, list):
+                        for block in c:
+                            if isinstance(block, dict) and block.get("type") == "text":
+                                text += block.get("text", "")
+                            elif isinstance(block, str):
+                                text += block
+
+                if text:
+                    full += text
+                    yield f"data: {json.dumps({'type':'token','content': text})}\n\n"
                 
             elif kind == "on_tool_start" and ev.get("name") in tool_names:
                 yield f"data: {json.dumps({'type':'tool_start','name':ev['name']})}\n\n"
@@ -89,6 +101,6 @@ async def stream_response(messages: list[BaseMessage]):
 
     except Exception as e:
         yield f"data: {json.dumps({'type':'error','content':str(e)})}\n\n"
-
+    print('model output: ', full)
     yield f"data: {json.dumps({'type':'end','full_response':full})}\n\n"
 

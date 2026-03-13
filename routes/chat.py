@@ -4,7 +4,7 @@ from fastapi.responses import StreamingResponse
 from langchain_core.messages import HumanMessage, AIMessage
 
 from schemas.chat import CreateChatReq, MessageReq
-from ..database import (
+from database import (
     create_chat, get_chats, delete_chat,
     save_message, get_messages,
     update_chat_title, get_message_count,
@@ -21,11 +21,11 @@ async def create_chat_route(req: CreateChatReq):
     return {'id': req.id, "title" : req.title}
 
 @router.get('/chats')
-async def get_chats():
+async def list_chats():
     return await get_chats()
 
-@router.get('/chats/{chat_id}')
-async def delete_chat(chat_id: str):
+@router.delete('/chats/{chat_id}')
+async def delete_chat_route(chat_id: str):
     await delete_chat(chat_id)
     return {"ok": True}
 
@@ -33,7 +33,7 @@ async def delete_chat(chat_id: str):
 async def get_messages_route(chat_id: str):
     return await get_messages(chat_id)
 
-@router.post('/chats/{chat_id}/messages')
+@router.post('/chats/{chat_id}/message')
 async def send_message_route(chat_id: str, req: MessageReq):
     await save_message(chat_id, "user", req.content)
     

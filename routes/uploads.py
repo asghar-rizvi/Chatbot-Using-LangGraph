@@ -15,6 +15,9 @@ async def upload_pdf(file: UploadFile = File(...)):
     path = os.path.join(UPLOAD_DIR, file.filename)
     data = await file.read()
     
+    with open(path, 'wb') as f:
+        f.write(data)
+    
     chunks = await asyncio.to_thread(add_pdf, path)
 
     return {"filename": file.filename, "chunks": chunks}

@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>AI Chatbot</title>
+  <link rel="stylesheet" href="/static/style.css" />
+  <script src="https://cdn.jsdelivr.net/npm/marked@12.0.0/marked.min.js"></script>
+</head>
+<body>
+  <div class="app">
+    <!-- SIDEBAR -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sb-head">
+        <span class="logo">🤖 Chats</span>
+        <button id="btn-new">+ New</button>
+      </div>
+      <div id="chat-list" class="chat-list"></div>
+      <div class="sb-foot">
+        <label class="upload-label" for="pdf-input">📄 Upload PDF</label>
+        <input type="file" id="pdf-input" accept=".pdf" hidden />
+        <div id="upload-status"></div>
+      </div>
+    </aside>
+
+    <!-- MAIN -->
+    <main class="main">
+      <header class="topbar">
+        <button id="btn-menu" class="btn-menu">☰</button>
+        <h3 id="chat-title">Select or create a chat</h3>
+      </header>
+
+      <section id="messages" class="messages">
+        <div class="welcome">
+          <h2>🤖 AI Chatbot</h2>
+          <p>Create a chat to get started</p>
+          <div class="pills">
+            <span>🧮 Calculator</span>
+            <span>📈 Stocks</span>
+            <span>🔍 Web Search</span>
+            <span>📄 PDF RAG</span>
+          </div>
+        </div>
+      </section>
+
+      <div class="input-bar">
+        <textarea id="msg-input" rows="1" placeholder="Type a message…"></textarea>
+        <button id="btn-send" title="Send">
+          <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
+               viewBox="0 0 24 24"><path d="M22 2L11 13M22 2l-7 20-4-9M22 2L2 9l9 4"/></svg>
+        </button>
+      </div>
+    </main>
+  </div>
+  <script src="/static/script.js"></script>
+</body>
+</html>

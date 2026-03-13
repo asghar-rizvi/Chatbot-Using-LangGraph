@@ -2,6 +2,7 @@ from langchain_google_genai import GoogleGenerativeAIEmbeddings
 from langchain_community.vectorstores import FAISS
 from langchain_community.document_loaders import PyPDFLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
+from langchain_huggingface import HuggingFaceEmbeddings
 
 _vector_store = None
 _embeddings = None
@@ -9,14 +10,21 @@ _embeddings = None
 def _get_embeddings():
     global _embeddings
     if _embeddings is None:
-        _embeddings = GoogleGenerativeAIEmbeddings(model='model/embedding-001')
+        # _embeddings = GoogleGenerativeAIEmbeddings(model='gemini-embedding-001')
+        _embeddings = HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
     return _embeddings
 
 def add_pdf(file_path) -> int:
+    import os
+    print(f"Attempting to load: {os.path.abspath(file_path)}")
+    
+    if not os.path.exists(file_path):
+        raise FileNotFoundError(f"File not found at: {file_path}")
+    
     global _vector_store
     loader = PyPDFLoader(file_path)
     docs = loader.load()
-    splitter = RecursiveCharacterTextSplitter(chunk_size=500, overlap=100)
+    splitter = RecursiveCharacterTextSplitter(chunk_size=500, chunk_overlap=100)
     chunks = splitter.split_documents(docs)
     if not chunks:
         return 0
